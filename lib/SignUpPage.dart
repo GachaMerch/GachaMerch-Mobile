@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const SignUpPage());
-}
+import 'LoginPage.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -29,6 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
       body: Stack(
         children: [
           //bg image
+
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -46,6 +44,7 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Center(
               child: Column(
                 children: [
+
                   SizedBox(height: 200),
                   Container(
                     child: Text(
@@ -58,6 +57,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                   ),
+                  
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 60),
                     child: Column(
@@ -271,6 +271,38 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: 40,
+            left: 20,
+            child: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Row(
+                children: [
+                  Container(
+                    height: 20,
+                    width: 20,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage("assets/loginpage/backArrow.png"),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    "Back",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: "Alexandria",
+                      fontWeight: FontWeight.w200,
+                      color: MainTextColor,
                     ),
                   ),
                 ],

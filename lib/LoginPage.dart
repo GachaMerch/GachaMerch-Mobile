@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'SignUpPage.dart';
 
-void main() {
-  runApp(const LoginPage());
-}
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -59,7 +55,8 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          //Isi hati Login Page
+          //Isi hati Login Pagepush
+
           SingleChildScrollView(
             child: Column(
               children: [
