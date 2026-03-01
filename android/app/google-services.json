@@ -12,7 +12,20 @@
           "package_name": "com.gachamerch.genshinimport"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "62326984297-cm2ln868cbmq30f8595pt6k1901v0lmf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gachamerch.genshinimport",
+            "certificate_hash": "46b4655f0aefad17b019b153c0fa025490eb6f43"
+          }
+        },
+        {
+          "client_id": "62326984297-7h3mhkib7rjg4paqfkomvrq83t8omnrb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDs-ulgIlfFWSLkB44LmZqpGZlLUZJEwbs"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "62326984297-7h3mhkib7rjg4paqfkomvrq83t8omnrb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

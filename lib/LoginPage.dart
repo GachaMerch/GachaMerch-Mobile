@@ -2,31 +2,95 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'SignUpPage.dart';
+import 'HomePage.dart';
+import 'services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
-  // This widget is the root of your application.
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
   bool _isVisible = true;
+  bool _isLoadingLogin = false;
+  bool _isLoadingGoogle = false;
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: '62326984297-7h3mhkib7rjg4paqfkomvrq83t8omnrb.apps.googleusercontent.com',
+  );
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      _showError('Username and password cannot be empty');
+      return;
+    }
+
+    setState(() => _isLoadingLogin = true);
+    try {
+      final result = await AuthService.login(username, password);
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => HomePage(user: result['user'])),
+        (_) => false,
+      );
+    } catch (e) {
+      _showError(e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      setState(() => _isLoadingLogin = false);
+    }
+  }
 
   Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoadingGoogle = true);
     try {
       final GoogleSignInAccount? account = await _googleSignIn.signIn();
       if (account != null) {
-        // TODO: kirim token ke backend
-        debugPrint('Logged in as: ${account.email}');
+        final auth = await account.authentication;
+        final idToken = auth.idToken;
+
+        if (idToken == null) {
+          _showError('Could not get Google token. Set serverClientId first.');
+          return;
+        }
+
+        final result = await AuthService.loginWithGoogle(idToken);
+        if (!mounted) return;
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => HomePage(user: result['user'])),
+          (_) => false,
+        );
       }
     } catch (e) {
+      _showError('Google Sign-In failed');
       debugPrint('Google Sign-In error: $e');
+    } finally {
+      setState(() => _isLoadingGoogle = false);
     }
   }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +100,10 @@ class _LoginPageState extends State<LoginPage> {
     Color CardFillColor = const Color(0x1AD9D9D9);
     Color CardStrokeColor = const Color(0xFFDBDBDB);
     Color ButtonFillColor = const Color(0x80D9D9D9);
-    Color BlackTextColor = const Color(0xFF000000);
 
     return Scaffold(
       body: Stack(
         children: [
-          //background image
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -50,11 +112,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-
-          //background color
           Container(color: BGColor),
-
-          //Icom admin
           Positioned(
             top: 40,
             right: 20,
@@ -68,9 +126,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-
-          //Isi hati Login Pagepush
-
           SingleChildScrollView(
             child: Column(
               children: [
@@ -85,7 +140,6 @@ class _LoginPageState extends State<LoginPage> {
                           fontFamily: "Alexandria",
                           fontWeight: FontWeight.bold,
                           color: MainTextColor,
-                          //height: 20,
                         ),
                       ),
                       SizedBox(height: 40),
@@ -108,34 +162,25 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 5),
                       TextField(
+                        controller: _usernameController,
                         style: TextStyle(color: MainTextColor),
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 0,
-                            horizontal: 10,
-                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                           hintText: "Your Username",
                           hintStyle: TextStyle(color: HintTextColor),
                           filled: true,
                           fillColor: CardFillColor,
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: MainTextColor,
-                              width: 1,
-                            ),
+                            borderSide: BorderSide(color: MainTextColor, width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.blueAccent,
-                              width: 1,
-                            ),
+                            borderSide: BorderSide(color: Colors.blueAccent, width: 1),
                           ),
                         ),
                       ),
                       SizedBox(height: 13),
-                      //password
                       Text(
                         "Password",
                         style: TextStyle(
@@ -147,14 +192,11 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 5),
                       TextField(
+                        controller: _passwordController,
                         obscureText: _isVisible,
                         style: TextStyle(color: MainTextColor),
-
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 0,
-                            horizontal: 10,
-                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                           hintText: "min. 8 characters",
                           hintStyle: TextStyle(color: HintTextColor),
                           filled: true,
@@ -175,24 +217,48 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: MainTextColor,
-                              width: 1,
-                            ),
+                            borderSide: BorderSide(color: MainTextColor, width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.blueAccent,
-                              width: 1,
-                            ),
+                            borderSide: BorderSide(color: Colors.blueAccent, width: 1),
                           ),
                         ),
                       ),
-                      //login button
-                      SizedBox(height: 35),
-                      //having trouble
-                      SizedBox(height: 5),
+                      SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: (_isLoadingLogin || _isLoadingGoogle) ? null : _handleLogin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ButtonFillColor,
+                            side: BorderSide(color: CardStrokeColor),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: _isLoadingLogin
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: MainTextColor,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  "Log In",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: "Alexandria",
+                                    fontWeight: FontWeight.w600,
+                                    color: MainTextColor,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
                       Center(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -212,10 +278,7 @@ class _LoginPageState extends State<LoginPage> {
                                 final Uri url = Uri.parse(
                                   "https://cs.hoyoverse.com/static/hoyoverse-new-csc-service-hall-fe/index.html?page_id=19&login_type=visitor&game_biz=platform_hyvpass&lang=en-us&utm_source=genshin&utm_medium=footer#/home",
                                 );
-                                if (!await launchUrl(
-                                  url,
-                                  mode: LaunchMode.externalApplication,
-                                )) {
+                                if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
                                   throw Exception("Could not launch $url");
                                 }
                               },
@@ -232,36 +295,17 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                       ),
-
-                      //divider
                       SizedBox(height: 36),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 2),
                         child: Divider(color: CardStrokeColor, thickness: 1),
                       ),
-
-                      //google sign in button
                       SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
                         height: 45,
-                        child: ElevatedButton.icon(
-                          onPressed: _handleGoogleSignIn,
-                          icon: Image.network(
-                            'https://www.google.com/favicon.ico',
-                            width: 18,
-                            height: 18,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.login, size: 18),
-                          ),
-                          label: Text(
-                            "Sign in with Google",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: "Alexandria",
-                              fontWeight: FontWeight.w500,
-                              color: BlackTextColor,
-                            ),
-                          ),
+                        child: ElevatedButton(
+                          onPressed: (_isLoadingLogin || _isLoadingGoogle) ? null : _handleGoogleSignIn,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ButtonFillColor,
                             side: BorderSide(color: CardStrokeColor),
@@ -269,55 +313,76 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
+                          child: _isLoadingGoogle
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: MainTextColor,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Image.asset(
+                                      'assets/icon/google-icon.png',
+                                      width: 18,
+                                      height: 18,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "Sign In with Google",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontFamily: "Alexandria",
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
-
-                      //have not regis
                       SizedBox(height: 31),
                       Center(
-                        child: Text(
-                          "Have not registered yet?",
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontFamily: "Alexandria",
-                            fontWeight: FontWeight.w300,
-                            color: MainTextColor,
-                          ),
-                        ),
-                      ),
-
-                      //sign up butong
-                      SizedBox(height: 5),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 45,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SignUpPage(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Have not registered yet? ",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: "Alexandria",
+                                fontWeight: FontWeight.w300,
+                                color: MainTextColor,
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ButtonFillColor,
-                            side: BorderSide(color: CardStrokeColor),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ),
-                          child: Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: "Alexandria",
-                              fontWeight: FontWeight.w500,
-                              color: BlackTextColor,
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignUpPage(),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontFamily: "Alexandria",
+                                  fontWeight: FontWeight.w600,
+                                  color: MainTextColor,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: MainTextColor,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
+                      SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -329,11 +394,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
-//todo
-//1. interact with admin butong + onpres admin butong
-//2. interact clickhere [DONE]
-//3. masukin mata + onpres mata [DONE]
-//4. password hide [DONE]
-//5. onpres login
-//6. onpres signup
