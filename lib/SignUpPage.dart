@@ -131,7 +131,7 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Center(
               child: Column(
                 children: [
-                  SizedBox(height: 200),
+                  SizedBox(height: 130),
                   Text(
                     "Sign Up",
                     style: TextStyle(

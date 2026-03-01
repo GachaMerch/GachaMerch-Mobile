@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                 Center(
                   child: Column(
                     children: [
-                      SizedBox(height: 200),
+                      SizedBox(height: 130),
                       Text(
                         "Log In",
                         style: TextStyle(
