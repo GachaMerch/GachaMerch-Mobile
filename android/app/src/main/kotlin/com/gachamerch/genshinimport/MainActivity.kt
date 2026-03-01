@@ -1,4 +1,4 @@
-package com.example.gm
+package com.gachamerch.genshinimport
 
 import io.flutter.embedding.android.FlutterActivity
 

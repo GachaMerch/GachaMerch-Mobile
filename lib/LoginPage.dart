@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'SignUpPage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,8 +12,21 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   bool _isVisible = true;
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  Future<void> _handleGoogleSignIn() async {
+    try {
+      final GoogleSignInAccount? account = await _googleSignIn.signIn();
+      if (account != null) {
+        // TODO: kirim token ke backend
+        debugPrint('Logged in as: ${account.email}');
+      }
+    } catch (e) {
+      debugPrint('Google Sign-In error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -224,6 +238,38 @@ class _LoginPageState extends State<LoginPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 2),
                         child: Divider(color: CardStrokeColor, thickness: 1),
+                      ),
+
+                      //google sign in button
+                      SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 45,
+                        child: ElevatedButton.icon(
+                          onPressed: _handleGoogleSignIn,
+                          icon: Image.network(
+                            'https://www.google.com/favicon.ico',
+                            width: 18,
+                            height: 18,
+                            errorBuilder: (_, __, ___) => const Icon(Icons.login, size: 18),
+                          ),
+                          label: Text(
+                            "Sign in with Google",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: "Alexandria",
+                              fontWeight: FontWeight.w500,
+                              color: BlackTextColor,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ButtonFillColor,
+                            side: BorderSide(color: CardStrokeColor),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
                       ),
 
                       //have not regis

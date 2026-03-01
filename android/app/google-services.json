@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "62326984297",
+    "project_id": "gachamerch-323bd",
+    "storage_bucket": "gachamerch-323bd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:62326984297:android:738479a0ff68f4956c1cf8",
+        "android_client_info": {
+          "package_name": "com.gachamerch.genshinimport"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDs-ulgIlfFWSLkB44LmZqpGZlLUZJEwbs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
