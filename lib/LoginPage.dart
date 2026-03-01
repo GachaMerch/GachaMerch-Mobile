@@ -389,7 +389,30 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
-        ],
+          Positioned(
+            top: 40,
+            right: 20,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginPageAdmin()
+                    )
+                );
+              },
+              child: Container(
+                height: 20,
+                width: 20,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/loginpage/adminLogo.png"),
+                  ),
+                ),
+              )
+            )
+          )
+        ]
       ),
     );
   }
