@@ -237,7 +237,10 @@ class _HomePageState extends State<HomePage> {
                   childAspectRatio: 1,
                 ),
                 itemCount: _weapons.length,
-                itemBuilder: (_, i) => _buildWeaponCard(_weapons[i]),
+                itemBuilder: (_, i) => GestureDetector(
+                  onTap: () => _showWeaponDetail(_weapons[i]),
+                  child: _buildWeaponCard(_weapons[i]),
+                ),
               ),
       ],
     );
@@ -274,6 +277,211 @@ class _HomePageState extends State<HomePage> {
               )
             : _weaponDummy(),
       ),
+    );
+  }
+
+  void _showWeaponDetail(dynamic weapon) {
+    final imagePath = weapon['Image'] as String? ?? '';
+    final imageUrl = imagePath.isNotEmpty ? '$_mediaBaseUrl$imagePath' : null;
+    final rarity = num.tryParse(weapon['Rarity']?.toString() ?? '')?.toInt() ?? 0;
+    final price = num.tryParse(weapon['Price']?.toString() ?? '')?.toInt().toString() ?? '0';
+    final baseAtk = num.tryParse(weapon['BaseAtk']?.toString() ?? '')?.toInt().toString() ?? '-';
+    final subStat = weapon['SubStat']?.toString() ?? '-';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.55,
+        minChildSize: 0.4,
+        maxChildSize: 0.85,
+        builder: (_, controller) => Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF2A2A2A),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: ListView(
+            controller: controller,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            children: [
+              // drag handle
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Image.asset(
+                    'assets/icon/Polygon.png',
+                    width: 20,
+                    height: 20,
+                  ),
+                ),
+              ),
+              // top row: info left, image right
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          weapon['Title']?.toString() ?? '',
+                          style: const TextStyle(
+                            color: _text,
+                            fontFamily: 'Alexandria',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          weapon['Type']?.toString() ?? '',
+                          style: const TextStyle(
+                            color: _subText,
+                            fontFamily: 'Alexandria',
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        if (subStat != '-') _detailStatVertical(subStat, null),
+                        const SizedBox(height: 12),
+                        _detailStatVertical('Basic Attack', baseAtk),
+                        const SizedBox(height: 16),
+                        // stars using asset
+                        Row(
+                          children: List.generate(
+                            5,
+                            (i) => Padding(
+                              padding: const EdgeInsets.only(right: 2),
+                              child: Image.asset(
+                                'assets/icon/star.png',
+                                width: 16,
+                                height: 16,
+                                color: i < rarity ? const Color(0xFFFFD700) : _subText,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // weapon image (right side)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: SizedBox(
+                      width: 130,
+                      height: 130,
+                      child: imageUrl != null
+                          ? Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (_, child, progress) => progress == null
+                                  ? child
+                                  : Container(
+                                      color: _card,
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: _subText,
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    ),
+                              errorBuilder: (_, __, ___) => _weaponDummy(),
+                            )
+                          : _weaponDummy(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Divider(color: Color(0xFF4A4A4A), thickness: 1),
+              const SizedBox(height: 12),
+              // passive
+              if (weapon['PassiveName'] != null && weapon['PassiveName'] != '-') ...[
+                Text(
+                  weapon['PassiveName'].toString(),
+                  style: const TextStyle(
+                    color: _text,
+                    fontFamily: 'Alexandria',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 6),
+              ],
+              if (weapon['PassiveDesc'] != null && weapon['PassiveDesc'] != '-')
+                Text(
+                  weapon['PassiveDesc'].toString(),
+                  style: const TextStyle(
+                    color: _subText,
+                    fontFamily: 'Alexandria',
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
+                ),
+              const SizedBox(height: 24),
+              // buy button aligned right with coin icon
+              Align(
+                alignment: Alignment.centerRight,
+                child: SizedBox(
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3A3A3A),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset('assets/icon/coin.png', width: 18, height: 18),
+                        const SizedBox(width: 8),
+                        Text(
+                          price,
+                          style: const TextStyle(
+                            color: _text,
+                            fontFamily: 'Alexandria',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _detailStatVertical(String label, String? value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(color: _subText, fontFamily: 'Alexandria', fontSize: 12),
+        ),
+        if (value != null) ...[
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              color: _text,
+              fontFamily: 'Alexandria',
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ],
     );
   }
 

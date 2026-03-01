@@ -3,7 +3,6 @@ import 'LoginPage.dart';
 
 void main() {
   runApp(const MyApp());
-  runApp(MaterialApp(home: LoginPage(), debugShowCheckedModeBanner: false));
 }
 
 class MyApp extends StatelessWidget {
