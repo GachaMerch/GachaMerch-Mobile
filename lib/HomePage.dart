@@ -2,15 +2,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'services/weapon_service.dart';
+import 'ProfilePage.dart';
 
 const String _mediaBaseUrl = kReleaseMode
     ? 'https://gachamerch-be.drian.my.id'
     : 'http://10.0.2.2:3000';
-
-const Color _bg = Color(0xFF1F1F1F);
-const Color _card = Color(0xFF2A2A2A);
-const Color _text = Color(0xFFFFFFFF);
-const Color _subText = Color(0xFF88888A);
 
 class HomePage extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -21,6 +17,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // theme-aware color getters
+  Color get _bg => Theme.of(context).scaffoldBackgroundColor;
+  Color get _card => Theme.of(context).colorScheme.surface;
+  Color get _text => Theme.of(context).colorScheme.onSurface;
+  static const Color _subText = Color(0xFF88888A);
+
   int _selectedIndex = 0;
   List<dynamic> _weapons = [];
   bool _isLoadingWeapons = true;
@@ -210,7 +212,7 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'New This Patch',
           style: TextStyle(
             fontSize: 18,
@@ -221,9 +223,9 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 12),
         _isLoadingWeapons
-            ? const Center(
+            ? Center(
                 child: Padding(
-                  padding: EdgeInsets.all(40),
+                  padding: const EdgeInsets.all(40),
                   child: CircularProgressIndicator(color: _text),
                 ),
               )
@@ -251,9 +253,10 @@ class _HomePageState extends State<HomePage> {
     final imageUrl = (imagePath != null && imagePath.isNotEmpty)
         ? '$_mediaBaseUrl$imagePath'
         : null;
+    final cardColor = _card;
     return Container(
       decoration: BoxDecoration(
-        color: _card,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ClipRRect(
@@ -265,7 +268,7 @@ class _HomePageState extends State<HomePage> {
                 loadingBuilder: (_, child, progress) => progress == null
                     ? child
                     : Container(
-                        color: _card,
+                        color: cardColor,
                         child: const Center(
                           child: CircularProgressIndicator(
                             color: _subText,
@@ -273,14 +276,18 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                errorBuilder: (_, __, ___) => _weaponDummy(),
+                errorBuilder: (_, __, ___) => _weaponDummy(cardColor),
               )
-            : _weaponDummy(),
+            : _weaponDummy(cardColor),
       ),
     );
   }
 
   void _showWeaponDetail(dynamic weapon) {
+    // capture colors before entering bottom sheet builder
+    final cardColor = _card;
+    final textColor = _text;
+
     final imagePath = weapon['Image'] as String? ?? '';
     final imageUrl = imagePath.isNotEmpty ? '$_mediaBaseUrl$imagePath' : null;
     final rarity = num.tryParse(weapon['Rarity']?.toString() ?? '')?.toInt() ?? 0;
@@ -302,7 +309,7 @@ class _HomePageState extends State<HomePage> {
         builder: (_, controller) => ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           child: ColoredBox(
-            color: const Color(0xFF2A2A2A),
+            color: cardColor,
             child: ListView(
             controller: controller,
             padding: const EdgeInsets.only(top: 8, bottom: 24),
@@ -332,8 +339,8 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           weapon['Title']?.toString() ?? '',
-                          style: const TextStyle(
-                            color: _text,
+                          style: TextStyle(
+                            color: textColor,
                             fontFamily: 'Alexandria',
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
@@ -351,9 +358,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        if (subStat != '-') _detailStatVertical(subStat, subStatValue),
+                        if (subStat != '-') _detailStatVertical(subStat, subStatValue, textColor),
                         const SizedBox(height: 12),
-                        _detailStatVertical('Basic Attack', baseAtk),
+                        _detailStatVertical('Basic Attack', baseAtk, textColor),
                         const SizedBox(height: 16),
                         // stars using asset
                         Row(
@@ -387,7 +394,7 @@ class _HomePageState extends State<HomePage> {
                               loadingBuilder: (_, child, progress) => progress == null
                                   ? child
                                   : Container(
-                                      color: _card,
+                                      color: cardColor,
                                       child: const Center(
                                         child: CircularProgressIndicator(
                                           color: _subText,
@@ -395,9 +402,9 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                              errorBuilder: (_, __, ___) => _weaponDummy(),
+                              errorBuilder: (_, __, ___) => _weaponDummy(cardColor),
                             )
-                          : _weaponDummy(),
+                          : _weaponDummy(cardColor),
                     ),
                   ),
                 ],
@@ -415,8 +422,8 @@ class _HomePageState extends State<HomePage> {
                     if (weapon['PassiveName'] != null && weapon['PassiveName'] != '-') ...[
                       Text(
                         weapon['PassiveName'].toString(),
-                        style: const TextStyle(
-                          color: _text,
+                        style: TextStyle(
+                          color: textColor,
                           fontFamily: 'Alexandria',
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
@@ -456,8 +463,8 @@ class _HomePageState extends State<HomePage> {
                               const SizedBox(width: 8),
                               Text(
                                 price,
-                                style: const TextStyle(
-                                  color: _text,
+                                style: TextStyle(
+                                  color: textColor,
                                   fontFamily: 'Alexandria',
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
@@ -479,7 +486,7 @@ class _HomePageState extends State<HomePage> {
   );
   }
 
-  Widget _detailStatVertical(String label, String? value) {
+  Widget _detailStatVertical(String label, String? value, Color textColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -491,8 +498,8 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 2),
           Text(
             value,
-            style: const TextStyle(
-              color: _text,
+            style: TextStyle(
+              color: textColor,
               fontFamily: 'Alexandria',
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -503,9 +510,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _weaponDummy() {
+  Widget _weaponDummy(Color cardColor) {
     return Container(
-      color: _card,
+      color: cardColor,
       child: const Center(
         child: Icon(Icons.shield_outlined, color: _subText, size: 40),
       ),
@@ -513,21 +520,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBottomNav() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: isDark ? Colors.black : const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(40),
+        border: isDark
+            ? Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1)
+            : null,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _navIcon('assets/icon/home-icon.png', 0),
-          _navIcon('assets/icon/weapon-icon.png', 1),
-          _navProfile(),
-          _navIcon('assets/icon/shop-icon.png', 3),
-          _navIcon('assets/icon/history-icon.png', 4),
+          Expanded(child: _navIcon('assets/icon/home-icon.png', 0)),
+          Expanded(child: _navIcon('assets/icon/weapon-icon.png', 1)),
+          Expanded(child: _navProfile()),
+          Expanded(child: _navIcon('assets/icon/shop-icon.png', 3)),
+          Expanded(child: _navIcon('assets/icon/history-icon.png', 4)),
         ],
       ),
     );
@@ -535,19 +545,23 @@ class _HomePageState extends State<HomePage> {
 
   Widget _navIcon(String asset, int index) {
     final selected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: selected ? const Color(0xFF3A3A3A) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Image.asset(
-          asset,
-          width: 24,
-          height: 24,
-          color: selected ? _text : _subText,
+    return SizedBox(
+      height: 48,
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedIndex = index),
+        child: Container(
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFF3A3A3A) : Colors.transparent,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Image.asset(
+              asset,
+              width: 24,
+              height: 24,
+              color: selected ? Colors.white : _subText,
+            ),
+          ),
         ),
       ),
     );
@@ -555,34 +569,36 @@ class _HomePageState extends State<HomePage> {
 
   Widget _navProfile() {
     final avatarUrl = widget.user['avatar'] as String?;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = 2),
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: _selectedIndex == 2 ? _text : Colors.transparent,
-            width: 2,
-          ),
+    final cardColor = _card;
+    return SizedBox(
+      height: 48,
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
         ),
-        child: ClipOval(
-          child: avatarUrl != null && avatarUrl.isNotEmpty
-              ? Image.network(
-                  avatarUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _profileFallback(),
-                )
-              : _profileFallback(),
+        child: Center(
+          child: SizedBox(
+            width: 48,
+            height: 48,
+            child: ClipOval(
+              child: avatarUrl != null && avatarUrl.isNotEmpty
+                  ? Image.network(
+                      avatarUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _profileFallback(cardColor),
+                    )
+                  : _profileFallback(cardColor),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _profileFallback() {
+  Widget _profileFallback(Color cardColor) {
     return Container(
-      color: _card,
+      color: cardColor,
       child: const Icon(Icons.person, color: _subText, size: 28),
     );
   }

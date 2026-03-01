@@ -35,6 +35,11 @@ jobs:
       - name: Generate launcher icons
         run: dart run flutter_launcher_icons
 
+      - name: Restore keystore from secret
+        run: |
+          mkdir -p ~/.android
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > ~/.android/debug.keystore
+
       - name: Build APK
         run: flutter build apk --release --split-per-abi
 
