@@ -107,14 +107,14 @@ class _LoginPageAdminState extends State<LoginPageAdmin> {
                       ),
                       SizedBox(height: 5),
                       TextField(
-                        style: TextStyle(color: MainTextColor),
+                        style: TextStyle(color: MainTextColor, fontSize: 12),
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
                             vertical: 0,
                             horizontal: 10,
                           ),
                           hintText: "12**56",
-                          hintStyle: TextStyle(color: HintTextColor),
+                          hintStyle: TextStyle(color: HintTextColor, fontSize: 12),
                           filled: true,
                           fillColor: CardFillColor,
                           enabledBorder: OutlineInputBorder(
@@ -147,7 +147,7 @@ class _LoginPageAdminState extends State<LoginPageAdmin> {
                       SizedBox(height: 5),
                       TextField(
                         obscureText: _isVisible,
-                        style: TextStyle(color: MainTextColor),
+                        style: TextStyle(color: MainTextColor, fontSize: 12),
 
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
@@ -155,7 +155,7 @@ class _LoginPageAdminState extends State<LoginPageAdmin> {
                             horizontal: 10,
                           ),
                           hintText: "min. 8 characters",
-                          hintStyle: TextStyle(color: HintTextColor),
+                          hintStyle: TextStyle(color: HintTextColor, fontSize: 12),
                           filled: true,
                           fillColor: CardFillColor,
                           suffixIcon: IconButton(

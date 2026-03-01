@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'LoginPageAdmin.dart';
 import 'SignUpPage.dart';
 import 'HomePage.dart';
 import 'services/auth_service.dart';
@@ -21,7 +22,8 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    serverClientId: '62326984297-7h3mhkib7rjg4paqfkomvrq83t8omnrb.apps.googleusercontent.com',
+    serverClientId:
+        '62326984297-7h3mhkib7rjg4paqfkomvrq83t8omnrb.apps.googleusercontent.com',
   );
 
   @override
@@ -90,7 +92,6 @@ class _LoginPageState extends State<LoginPage> {
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -163,20 +164,29 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 5),
                       TextField(
                         controller: _usernameController,
-                        style: TextStyle(color: MainTextColor),
+                        style: TextStyle(color: MainTextColor, fontSize: 12),
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 0,
+                            horizontal: 10,
+                          ),
                           hintText: "Your Username",
-                          hintStyle: TextStyle(color: HintTextColor),
+                          hintStyle: TextStyle(color: HintTextColor, fontSize: 12),
                           filled: true,
                           fillColor: CardFillColor,
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: MainTextColor, width: 1),
+                            borderSide: BorderSide(
+                              color: MainTextColor,
+                              width: 1,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                            borderSide: BorderSide(
+                              color: Colors.blueAccent,
+                              width: 1,
+                            ),
                           ),
                         ),
                       ),
@@ -194,11 +204,14 @@ class _LoginPageState extends State<LoginPage> {
                       TextField(
                         controller: _passwordController,
                         obscureText: _isVisible,
-                        style: TextStyle(color: MainTextColor),
+                        style: TextStyle(color: MainTextColor, fontSize: 12),
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 0,
+                            horizontal: 10,
+                          ),
                           hintText: "min. 8 characters",
-                          hintStyle: TextStyle(color: HintTextColor),
+                          hintStyle: TextStyle(color: HintTextColor, fontSize: 12),
                           filled: true,
                           fillColor: CardFillColor,
                           suffixIcon: IconButton(
@@ -217,11 +230,17 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: MainTextColor, width: 1),
+                            borderSide: BorderSide(
+                              color: MainTextColor,
+                              width: 1,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                            borderSide: BorderSide(
+                              color: Colors.blueAccent,
+                              width: 1,
+                            ),
                           ),
                         ),
                       ),
@@ -230,7 +249,9 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         height: 45,
                         child: ElevatedButton(
-                          onPressed: (_isLoadingLogin || _isLoadingGoogle) ? null : _handleLogin,
+                          onPressed: (_isLoadingLogin || _isLoadingGoogle)
+                              ? null
+                              : _handleLogin,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ButtonFillColor,
                             side: BorderSide(color: CardStrokeColor),
@@ -278,7 +299,10 @@ class _LoginPageState extends State<LoginPage> {
                                 final Uri url = Uri.parse(
                                   "https://cs.hoyoverse.com/static/hoyoverse-new-csc-service-hall-fe/index.html?page_id=19&login_type=visitor&game_biz=platform_hyvpass&lang=en-us&utm_source=genshin&utm_medium=footer#/home",
                                 );
-                                if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                                if (!await launchUrl(
+                                  url,
+                                  mode: LaunchMode.externalApplication,
+                                )) {
                                   throw Exception("Could not launch $url");
                                 }
                               },
@@ -305,7 +329,9 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         height: 45,
                         child: ElevatedButton(
-                          onPressed: (_isLoadingLogin || _isLoadingGoogle) ? null : _handleGoogleSignIn,
+                          onPressed: (_isLoadingLogin || _isLoadingGoogle)
+                              ? null
+                              : _handleGoogleSignIn,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ButtonFillColor,
                             side: BorderSide(color: CardStrokeColor),
@@ -396,9 +422,7 @@ class _LoginPageState extends State<LoginPage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginPageAdmin()
-                    )
+                  MaterialPageRoute(builder: (context) => LoginPageAdmin()),
                 );
               },
               child: Container(
@@ -409,10 +433,10 @@ class _LoginPageState extends State<LoginPage> {
                     image: AssetImage("assets/loginpage/adminLogo.png"),
                   ),
                 ),
-              )
-            )
-          )
-        ]
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
