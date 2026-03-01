@@ -13,7 +13,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home : LoginPage(),
+      theme: ThemeData(
+        bottomSheetTheme: const BottomSheetThemeData(
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          showDragHandle: false,
+        ),
+      ),
+      home: LoginPage(),
     );
   }
 }
