@@ -229,24 +229,17 @@ class _NotificationPageState extends State<NotificationPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _typeIcon(type),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      color: textColor,
-                      fontFamily: 'Alexandria',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
+            _typeChip(type),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: TextStyle(
+                color: textColor,
+                fontFamily: 'Alexandria',
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -278,30 +271,27 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  Widget _typeIcon(String type) {
-    IconData icon;
-    Color color;
-    switch (type) {
-      case 'maintenance':
-        icon = Icons.build_outlined;
-        color = Colors.orangeAccent;
-        break;
-      case 'event':
-        icon = Icons.celebration_outlined;
-        color = const Color(0xFFD4AF37);
-        break;
-      default: // update
-        icon = Icons.system_update_outlined;
-        color = Colors.blueAccent;
-    }
+  Widget _typeChip(String type) {
+    final label = switch (type) {
+      'maintenance' => 'Maintenance',
+      'event'       => 'Event',
+      _             => 'Update',
+    };
     return Container(
-      width: 28,
-      height: 28,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
+        color: const Color(0xFF3A3A3A),
+        borderRadius: BorderRadius.circular(6),
       ),
-      child: Icon(icon, size: 16, color: color),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: _subText,
+          fontFamily: 'Alexandria',
+          fontWeight: FontWeight.w600,
+          fontSize: 10,
+        ),
+      ),
     );
   }
 }
