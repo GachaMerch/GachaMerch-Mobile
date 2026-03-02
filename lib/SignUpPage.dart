@@ -164,12 +164,12 @@ class _SignUpPageState extends State<SignUpPage> {
                         SizedBox(height: 5),
                         TextField(
                           controller: _emailController,
-                          style: TextStyle(color: MainTextColor),
+                          style: TextStyle(color: MainTextColor, fontSize: 12),
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                             hintText: "player@genshin.import",
-                            hintStyle: TextStyle(color: HintTextColor),
+                            hintStyle: TextStyle(color: HintTextColor, fontSize: 12),
                             filled: true,
                             fillColor: CardFillColor,
                             enabledBorder: OutlineInputBorder(
@@ -195,11 +195,11 @@ class _SignUpPageState extends State<SignUpPage> {
                         SizedBox(height: 5),
                         TextField(
                           controller: _usernameController,
-                          style: TextStyle(color: MainTextColor),
+                          style: TextStyle(color: MainTextColor, fontSize: 12),
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                             hintText: "Your name",
-                            hintStyle: TextStyle(color: HintTextColor),
+                            hintStyle: TextStyle(color: HintTextColor, fontSize: 12),
                             filled: true,
                             fillColor: CardFillColor,
                             enabledBorder: OutlineInputBorder(
@@ -226,11 +226,11 @@ class _SignUpPageState extends State<SignUpPage> {
                         TextField(
                           controller: _passwordController,
                           obscureText: _isVisible1,
-                          style: TextStyle(color: MainTextColor),
+                          style: TextStyle(color: MainTextColor, fontSize: 12),
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                             hintText: "min. 8 characters",
-                            hintStyle: TextStyle(color: HintTextColor),
+                            hintStyle: TextStyle(color: HintTextColor, fontSize: 12),
                             filled: true,
                             fillColor: CardFillColor,
                             suffixIcon: IconButton(
@@ -271,11 +271,11 @@ class _SignUpPageState extends State<SignUpPage> {
                         TextField(
                           controller: _confirmPasswordController,
                           obscureText: _isVisible2,
-                          style: TextStyle(color: MainTextColor),
+                          style: TextStyle(color: MainTextColor, fontSize: 12),
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                             hintText: "min. 8 characters",
-                            hintStyle: TextStyle(color: HintTextColor),
+                            hintStyle: TextStyle(color: HintTextColor, fontSize: 12),
                             filled: true,
                             fillColor: CardFillColor,
                             suffixIcon: IconButton(

@@ -39,10 +39,10 @@ class _HomePageState extends State<HomePage> {
 
   final List<String> _banners = [
     'assets/banner/banner-1.png',
-    'assets/banner/banner-1.png',
-    'assets/banner/banner-1.png',
-    'assets/banner/banner-1.png',
-    'assets/banner/banner-1.png',
+    'assets/banner/banner-2.png',
+    'assets/banner/banner-3.png',
+    'assets/banner/banner-4.png',
+    'assets/banner/banner-5.png',
   ];
   final PageController _bannerController = PageController();
   Timer? _bannerTimer;

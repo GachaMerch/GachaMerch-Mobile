@@ -429,7 +429,12 @@ class _ColorModeCard extends StatelessWidget {
                         AdaptiveTheme.of(context).setLight();
                       }
                     },
-                    activeThumbColor: const Color(0xFFD4AF37),
+                    thumbColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return const Color(0xFFD4AF37);
+                      }
+                      return null;
+                    }),
                   ),
                 ),
               ),
