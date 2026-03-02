@@ -6,6 +6,7 @@ import 'widgets/app_bottom_nav.dart';
 import 'widgets/buy_dialog.dart';
 import 'InventoryPage.dart';
 import 'ProfilePage.dart';
+import 'NotificationPage.dart';
 import 'utils.dart';
 
 const String _mediaBaseUrl = kReleaseMode
@@ -486,6 +487,11 @@ class _ShopPageState extends State<ShopPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => ProfilePage(user: _user)),
+                  );
+                } else if (tab == NavTab.history) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => NotificationPage(user: _user)),
                   );
                 }
               },

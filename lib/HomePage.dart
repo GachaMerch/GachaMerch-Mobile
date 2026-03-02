@@ -9,6 +9,7 @@ import 'utils.dart';
 import 'ProfilePage.dart';
 import 'InventoryPage.dart';
 import 'ShopPage.dart';
+import 'NotificationPage.dart';
 
 const String _mediaBaseUrl = kReleaseMode
     ? 'https://gachamerch-be.drian.my.id'
@@ -167,6 +168,8 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilePage(user: _user)));
                 } else if (tab == NavTab.shop) {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => ShopPage(user: _user)));
+                } else if (tab == NavTab.history) {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => NotificationPage(user: _user)));
                 }
               },
             ),

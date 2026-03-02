@@ -23,6 +23,17 @@ class MyApp extends StatelessWidget {
           onSurface: Color(0xFF1A1A1A),
           primary: Color(0xFFD4AF37),
         ),
+        switchTheme: SwitchThemeData(
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return Colors.white;
+            return const Color(0xFF88888A);
+          }),
+          trackColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return const Color(0xFF4A4A4A);
+            return const Color(0xFFCCCCCC);
+          }),
+          trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+        ),
         bottomSheetTheme: const BottomSheetThemeData(
           surfaceTintColor: Colors.transparent,
           elevation: 0,
@@ -37,6 +48,17 @@ class MyApp extends StatelessWidget {
           surface: Color(0xFF2A2A2A),
           onSurface: Colors.white,
           primary: Color(0xFFD4AF37),
+        ),
+        switchTheme: SwitchThemeData(
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return Colors.white;
+            return const Color(0xFF88888A);
+          }),
+          trackColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return const Color(0xFF4A4A4A);
+            return const Color(0xFF2A2A2A);
+          }),
+          trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
         ),
         bottomSheetTheme: const BottomSheetThemeData(
           surfaceTintColor: Colors.transparent,

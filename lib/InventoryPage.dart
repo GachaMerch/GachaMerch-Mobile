@@ -4,6 +4,7 @@ import 'services/inventory_service.dart';
 import 'widgets/app_bottom_nav.dart';
 import 'ProfilePage.dart';
 import 'ShopPage.dart';
+import 'NotificationPage.dart';
 import 'utils.dart';
 
 const String _mediaBaseUrl = kReleaseMode
@@ -449,6 +450,11 @@ class _InventoryPageState extends State<InventoryPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => ShopPage(user: widget.user)),
+                  );
+                } else if (tab == NavTab.history) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => NotificationPage(user: widget.user)),
                   );
                 }
               },

@@ -5,6 +5,7 @@ import 'widgets/profile_edit_dialog.dart';
 import 'widgets/app_bottom_nav.dart';
 import 'InventoryPage.dart';
 import 'ShopPage.dart';
+import 'NotificationPage.dart';
 import 'LoginPage.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -266,6 +267,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     context,
                     MaterialPageRoute(builder: (_) => ShopPage(user: _user)),
                   );
+                } else if (tab == NavTab.history) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => NotificationPage(user: _user)),
+                  );
                 }
               },
             ),
@@ -381,12 +387,6 @@ class _ColorModeCard extends StatelessWidget {
                         AdaptiveTheme.of(context).setLight();
                       }
                     },
-                    thumbColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return const Color(0xFFD4AF37);
-                      }
-                      return null;
-                    }),
                   ),
                 ),
               ),
