@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'services/inventory_service.dart';
+import 'widgets/app_bottom_nav.dart';
+import 'ProfilePage.dart';
+import 'ShopPage.dart';
 import 'utils.dart';
 
 const String _mediaBaseUrl = kReleaseMode
@@ -431,7 +434,25 @@ class _InventoryPageState extends State<InventoryPage> {
                 ],
               ),
             ),
-            _buildBottomNav(),
+            AppBottomNav(
+              activeTab: NavTab.inventory,
+              avatarUrl: widget.user['avatar'] as String?,
+              onTap: (tab) {
+                if (tab == NavTab.home) {
+                  Navigator.pop(context);
+                } else if (tab == NavTab.profile) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
+                  );
+                } else if (tab == NavTab.shop) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => ShopPage(user: widget.user)),
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -670,108 +691,4 @@ class _InventoryPageState extends State<InventoryPage> {
     );
   }
 
-  Widget _buildBottomNav() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final avatarUrl = widget.user['avatar'] as String?;
-
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.black : const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(40),
-        border: isDark
-            ? Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1)
-            : null,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _navItem(
-              asset: 'assets/icon/home-icon.png',
-              selected: false,
-              onTap: () => Navigator.pop(context),
-            ),
-          ),
-          // weapon — active
-          Expanded(
-            child: SizedBox(
-              height: 48,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF3A3A3A),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Center(
-                  child: Image.asset(
-                    'assets/icon/weapon-icon.png',
-                    width: 24,
-                    height: 24,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // profile avatar
-          Expanded(
-            child: SizedBox(
-              height: 48,
-              child: Center(
-                child: SizedBox(
-                  width: 32,
-                  height: 32,
-                  child: ClipOval(
-                    child: avatarUrl != null && avatarUrl.isNotEmpty
-                        ? Image.network(
-                            avatarUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _avatarFallback(),
-                          )
-                        : _avatarFallback(),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: _navItem(asset: 'assets/icon/shop-icon.png', selected: false),
-          ),
-          Expanded(
-            child: _navItem(asset: 'assets/icon/history-icon.png', selected: false),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _navItem({required String asset, required bool selected, VoidCallback? onTap}) {
-    return SizedBox(
-      height: 48,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFF3A3A3A) : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Center(
-            child: Image.asset(
-              asset,
-              width: 24,
-              height: 24,
-              color: selected ? Colors.white : _subText,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _avatarFallback() {
-    return Container(
-      color: const Color(0xFF3A3A3A),
-      child: const Icon(Icons.person, color: _subText, size: 20),
-    );
-  }
 }

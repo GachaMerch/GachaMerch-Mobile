@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'services/weapon_service.dart';
 import 'services/auth_service.dart';
 import 'widgets/buy_dialog.dart';
+import 'widgets/app_bottom_nav.dart';
 import 'utils.dart';
 import 'ProfilePage.dart';
 import 'InventoryPage.dart';
+import 'ShopPage.dart';
 
 const String _mediaBaseUrl = kReleaseMode
     ? 'https://gachamerch-be.drian.my.id'
@@ -28,7 +30,6 @@ class _HomePageState extends State<HomePage> {
   static const Color _subText = Color(0xFF88888A);
 
   Map<String, dynamic> _user = <String, dynamic>{};
-  int _selectedIndex = 0;
   List<dynamic> _weapons = [];
   bool _isLoadingWeapons = true;
   bool _isLoadingMore = false;
@@ -156,7 +157,19 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            _buildBottomNav(),
+            AppBottomNav(
+              activeTab: NavTab.home,
+              avatarUrl: _user['avatar'] as String?,
+              onTap: (tab) {
+                if (tab == NavTab.inventory) {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => InventoryPage(user: _user)));
+                } else if (tab == NavTab.profile) {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilePage(user: _user)));
+                } else if (tab == NavTab.shop) {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => ShopPage(user: _user)));
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -586,114 +599,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBottomNav() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.black : const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(40),
-        border: isDark
-            ? Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1)
-            : null,
-      ),
-      child: Row(
-        children: [
-          Expanded(child: _navIcon('assets/icon/home-icon.png', 0)),
-          Expanded(child: _navWeapon()),
-          Expanded(child: _navProfile()),
-          Expanded(child: _navIcon('assets/icon/shop-icon.png', 3)),
-          Expanded(child: _navIcon('assets/icon/history-icon.png', 4)),
-        ],
-      ),
-    );
-  }
-
-  Widget _navIcon(String asset, int index) {
-    final selected = _selectedIndex == index;
-    return SizedBox(
-      height: 48,
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedIndex = index),
-        child: Container(
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFF3A3A3A) : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Center(
-            child: Image.asset(
-              asset,
-              width: 24,
-              height: 24,
-              color: selected ? Colors.white : _subText,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _navWeapon() {
-    return SizedBox(
-      height: 48,
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => InventoryPage(user: _user)),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Center(
-            child: Image.asset(
-              'assets/icon/weapon-icon.png',
-              width: 24,
-              height: 24,
-              color: _subText,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _navProfile() {
-    final avatarUrl = _user['avatar'] as String?;
-    final cardColor = _card;
-    return SizedBox(
-      height: 48,
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => ProfilePage(user: _user)),
-        ),
-        child: Center(
-          child: SizedBox(
-            width: 48,
-            height: 48,
-            child: ClipOval(
-              child: avatarUrl != null && avatarUrl.isNotEmpty
-                  ? Image.network(
-                      avatarUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _profileFallback(cardColor),
-                    )
-                  : _profileFallback(cardColor),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _profileFallback(Color cardColor) {
-    return Container(
-      color: cardColor,
-      child: const Icon(Icons.person, color: _subText, size: 28),
-    );
-  }
 }
 

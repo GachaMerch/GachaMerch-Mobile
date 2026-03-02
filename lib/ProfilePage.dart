@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'services/auth_service.dart';
 import 'widgets/profile_edit_dialog.dart';
+import 'widgets/app_bottom_nav.dart';
+import 'InventoryPage.dart';
+import 'ShopPage.dart';
 import 'LoginPage.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -245,7 +248,28 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          SafeArea(top: false, child: _buildBottomNav(context)),
+          SafeArea(
+            top: false,
+            child: AppBottomNav(
+              activeTab: NavTab.profile,
+              avatarUrl: _user['avatar'] as String?,
+              onTap: (tab) {
+                if (tab == NavTab.home) {
+                  Navigator.pop(context);
+                } else if (tab == NavTab.inventory) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => InventoryPage(user: _user)),
+                  );
+                } else if (tab == NavTab.shop) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => ShopPage(user: _user)),
+                  );
+                }
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -301,78 +325,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildBottomNav(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final avatarUrl = _user['avatar'] as String?;
-
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.black : const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(40),
-        border: isDark
-            ? Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1)
-            : null,
-      ),
-      child: Row(
-        children: [
-          Expanded(child: _navIcon(context, 'assets/icon/home-icon.png')),
-          Expanded(child: _navIcon(context, 'assets/icon/weapon-icon.png')),
-          // profile — active (center)
-          Expanded(
-            child: Center(
-              child: SizedBox(
-                width: 48,
-                height: 48,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: ClipOval(
-                    child: avatarUrl != null && avatarUrl.isNotEmpty
-                        ? Image.network(
-                            avatarUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _navAvatarFallback(),
-                          )
-                        : _navAvatarFallback(),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(child: _navIcon(context, 'assets/icon/shop-icon.png')),
-          Expanded(child: _navIcon(context, 'assets/icon/history-icon.png')),
-        ],
-      ),
-    );
-  }
-
-  Widget _navAvatarFallback() {
-    return Container(
-      color: const Color(0xFF3A3A3A),
-      child: const Icon(Icons.person, color: Color(0xFF88888A), size: 28),
-    );
-  }
-
-  Widget _navIcon(BuildContext context, String asset) {
-    return SizedBox(
-      height: 48,
-      child: GestureDetector(
-        onTap: () => Navigator.pop(context),
-        child: Center(
-          child: Image.asset(
-            asset,
-            width: 24,
-            height: 24,
-            color: const Color(0xFF88888A),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 // ── Color Mode Card ────────────────────────────────────────────────────────────
