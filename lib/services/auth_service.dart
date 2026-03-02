@@ -16,8 +16,11 @@ class AuthService {
     );
     final data = jsonDecode(res.body);
     if (res.statusCode == 200 && data['success'] == true) {
-      await _saveToken(data['data']['token']);
-      return data['data'];
+      final d = data['data'];
+      if (d is! Map) throw Exception('Invalid response from server');
+      final map = Map<String, dynamic>.from(d);
+      await _saveToken(map['token']?.toString() ?? '');
+      return map;
     }
     throw Exception(data['message'] ?? 'Google auth failed');
   }
@@ -31,8 +34,11 @@ class AuthService {
     );
     final data = jsonDecode(res.body);
     if (res.statusCode == 201 && data['success'] == true) {
-      await _saveToken(data['data']['token']);
-      return data['data'];
+      final d = data['data'];
+      if (d is! Map) throw Exception('Invalid response from server');
+      final map = Map<String, dynamic>.from(d);
+      await _saveToken(map['token']?.toString() ?? '');
+      return map;
     }
     throw Exception(data['message'] ?? 'Registration failed');
   }
@@ -46,8 +52,11 @@ class AuthService {
     );
     final data = jsonDecode(res.body);
     if (res.statusCode == 200 && data['success'] == true) {
-      await _saveToken(data['data']['token']);
-      return data['data'];
+      final d = data['data'];
+      if (d is! Map) throw Exception('Invalid response from server');
+      final map = Map<String, dynamic>.from(d);
+      await _saveToken(map['token']?.toString() ?? '');
+      return map;
     }
     throw Exception(data['message'] ?? 'Login failed');
   }
@@ -71,7 +80,9 @@ class AuthService {
     );
     final data = jsonDecode(res.body);
     if (res.statusCode == 200 && data['success'] == true) {
-      return data['data'];
+      final d = data['data'];
+      if (d is! Map) throw Exception('Invalid response from server');
+      return Map<String, dynamic>.from(d);
     }
     throw Exception(data['message'] ?? 'Update failed');
   }
@@ -86,7 +97,9 @@ class AuthService {
     );
     final data = jsonDecode(res.body);
     if (res.statusCode == 200 && data['success'] == true) {
-      return data['data'];
+      final d = data['data'];
+      if (d is! Map) throw Exception('Invalid response from server');
+      return Map<String, dynamic>.from(d);
     }
     throw Exception(data['message'] ?? 'Failed to fetch user');
   }

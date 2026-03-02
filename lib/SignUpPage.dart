@@ -58,9 +58,12 @@ class _SignUpPageState extends State<SignUpPage> {
     try {
       final result = await AuthService.register(username, email, password);
       if (!mounted) return;
+      final userRaw = result['user'];
+      if (userRaw is! Map) throw Exception('Invalid registration response');
+      final user = Map<String, dynamic>.from(userRaw);
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => HomePage(user: result['user'])),
+        MaterialPageRoute(builder: (_) => HomePage(user: user)),
         (_) => false,
       );
     } catch (e) {
@@ -85,9 +88,12 @@ class _SignUpPageState extends State<SignUpPage> {
 
         final result = await AuthService.loginWithGoogle(idToken);
         if (!mounted) return;
+        final userRaw = result['user'];
+        if (userRaw is! Map) throw Exception('Invalid login response');
+        final user = Map<String, dynamic>.from(userRaw);
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (_) => HomePage(user: result['user'])),
+          MaterialPageRoute(builder: (_) => HomePage(user: user)),
           (_) => false,
         );
       }

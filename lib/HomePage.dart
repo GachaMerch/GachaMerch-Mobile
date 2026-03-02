@@ -6,6 +6,7 @@ import 'services/auth_service.dart';
 import 'widgets/buy_dialog.dart';
 import 'utils.dart';
 import 'ProfilePage.dart';
+import 'InventoryPage.dart';
 
 const String _mediaBaseUrl = kReleaseMode
     ? 'https://gachamerch-be.drian.my.id'
@@ -600,7 +601,7 @@ class _HomePageState extends State<HomePage> {
       child: Row(
         children: [
           Expanded(child: _navIcon('assets/icon/home-icon.png', 0)),
-          Expanded(child: _navIcon('assets/icon/weapon-icon.png', 1)),
+          Expanded(child: _navWeapon()),
           Expanded(child: _navProfile()),
           Expanded(child: _navIcon('assets/icon/shop-icon.png', 3)),
           Expanded(child: _navIcon('assets/icon/history-icon.png', 4)),
@@ -626,6 +627,32 @@ class _HomePageState extends State<HomePage> {
               width: 24,
               height: 24,
               color: selected ? Colors.white : _subText,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _navWeapon() {
+    return SizedBox(
+      height: 48,
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => InventoryPage(user: _user)),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Image.asset(
+              'assets/icon/weapon-icon.png',
+              width: 24,
+              height: 24,
+              color: _subText,
             ),
           ),
         ),

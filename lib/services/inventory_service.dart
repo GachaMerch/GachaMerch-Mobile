@@ -7,27 +7,22 @@ const String _prodUrl = 'https://gachamerch-be.drian.my.id/api';
 const String _devUrl = 'http://10.0.2.2:3000/api';
 String get _baseUrl => kReleaseMode ? _prodUrl : _devUrl;
 
-class OrderService {
-  static Future<Map<String, dynamic>> buyWeapon({
-    required int weaponId,
-    required int quantity,
-  }) async {
+class InventoryService {
+  static Future<List<dynamic>> getInventory() async {
     final token = await AuthService.getToken();
-    final res = await http.post(
-      Uri.parse('$_baseUrl/order/buy'),
+    final res = await http.get(
+      Uri.parse('$_baseUrl/inventory'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({'weaponId': weaponId, 'quantity': quantity}),
     );
     final data = jsonDecode(res.body);
-    if ((res.statusCode == 200 || res.statusCode == 201) &&
-        data['success'] == true) {
+    if (res.statusCode == 200 && data['success'] == true) {
       final d = data['data'];
-      if (d is! Map) throw Exception('Invalid response from server');
-      return Map<String, dynamic>.from(d);
+      if (d is! List) throw Exception('Invalid response from server');
+      return List<dynamic>.from(d);
     }
-    throw Exception(data['message'] ?? 'Purchase failed');
+    throw Exception(data['message'] ?? 'Failed to fetch inventory');
   }
 }
