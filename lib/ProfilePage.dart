@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'services/auth_service.dart';
 import 'widgets/profile_edit_dialog.dart';
+import 'widgets/add_weapon_dialog.dart';
 import 'widgets/app_bottom_nav.dart';
 import 'InventoryPage.dart';
 import 'ShopPage.dart';
@@ -37,6 +38,19 @@ class _ProfilePageState extends State<ProfilePage> {
   Color get _subText => Theme.of(context).brightness == Brightness.dark
       ? const Color(0xFF88888A)
       : const Color(0xFF8A8A8E);
+
+  bool get _isAdmin => _user['roleId'] == 1;
+
+  void _showAddWeaponSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      showDragHandle: false,
+      elevation: 0,
+      builder: (_) => const AddWeaponSheet(),
+    );
+  }
 
   void _showProfileEditDialog() {
     showDialog(
@@ -210,6 +224,18 @@ class _ProfilePageState extends State<ProfilePage> {
                           trailing: Icon(Icons.chevron_right, color: subText, size: 20),
                           onTap: _showProfileEditDialog,
                         ),
+                        if (_isAdmin) ...[
+                          const SizedBox(height: 10),
+                          _menuCard(
+                            card: card,
+                            icon: Icons.add_box_outlined,
+                            label: 'Add Weapon',
+                            textColor: text,
+                            iconColor: subText,
+                            trailing: Icon(Icons.chevron_right, color: subText, size: 20),
+                            onTap: _showAddWeaponSheet,
+                          ),
+                        ],
                         const SizedBox(height: 10),
                         _ColorModeCard(card: card, textColor: text, iconColor: subText),
                         const SizedBox(height: 10),

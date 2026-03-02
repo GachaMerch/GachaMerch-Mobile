@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'services/inventory_service.dart';
+import 'services/auth_service.dart';
 import 'widgets/app_bottom_nav.dart';
 import 'ProfilePage.dart';
 import 'ShopPage.dart';
@@ -48,6 +49,7 @@ class _InventoryPageState extends State<InventoryPage> {
   Color get _card => Theme.of(context).colorScheme.surface;
   Color get _text => Theme.of(context).colorScheme.onSurface;
 
+  Map<String, dynamic> _user = {};
   List<dynamic> _items = [];
   bool _isLoading = true;
   _SortOption _sortOption = _SortOption.rarityDesc;
@@ -55,7 +57,16 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   void initState() {
     super.initState();
+    _user = Map<String, dynamic>.from(widget.user);
     _fetchInventory();
+    _refreshUser();
+  }
+
+  Future<void> _refreshUser() async {
+    try {
+      final fresh = await AuthService.getMe();
+      if (mounted) setState(() => _user = {..._user, ...fresh});
+    } catch (_) {}
   }
 
   Future<void> _fetchInventory() async {
@@ -66,6 +77,8 @@ class _InventoryPageState extends State<InventoryPage> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+
+  Future<void> _refresh() => Future.wait([_fetchInventory(), _refreshUser()]);
 
   List<dynamic> get _sortedItems {
     final list = List<dynamic>.from(_items);
@@ -401,8 +414,13 @@ class _InventoryPageState extends State<InventoryPage> {
         child: Column(
           children: [
             Expanded(
-              child: CustomScrollView(
-                slivers: [
+              child: RefreshIndicator(
+                onRefresh: _refresh,
+                color: Colors.white,
+                backgroundColor: const Color(0xFF3A3A3A),
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
                   SliverToBoxAdapter(child: _buildHeader()),
                   SliverToBoxAdapter(child: _buildSortRow()),
                   if (_isLoading)
@@ -435,26 +453,27 @@ class _InventoryPageState extends State<InventoryPage> {
                 ],
               ),
             ),
+          ),
             AppBottomNav(
               activeTab: NavTab.inventory,
-              avatarUrl: widget.user['avatar'] as String?,
+              avatarUrl: _user['avatar'] as String?,
               onTap: (tab) {
                 if (tab == NavTab.home) {
                   Navigator.pop(context);
                 } else if (tab == NavTab.profile) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
+                    MaterialPageRoute(builder: (_) => ProfilePage(user: _user)),
                   );
                 } else if (tab == NavTab.shop) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => ShopPage(user: widget.user)),
+                    MaterialPageRoute(builder: (_) => ShopPage(user: _user)),
                   );
                 } else if (tab == NavTab.history) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => NotificationPage(user: widget.user)),
+                    MaterialPageRoute(builder: (_) => NotificationPage(user: _user)),
                   );
                 }
               },

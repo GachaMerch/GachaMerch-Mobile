@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'services/shop_service.dart';
+import 'services/auth_service.dart';
 import 'widgets/app_bottom_nav.dart';
 import 'widgets/buy_dialog.dart';
 import 'InventoryPage.dart';
@@ -97,6 +98,15 @@ class _ShopPageState extends State<ShopPage> {
     _categoryController.dispose();
     super.dispose();
   }
+
+  Future<void> _refreshUser() async {
+    try {
+      final fresh = await AuthService.getMe();
+      if (mounted) setState(() => _user = {..._user, ...fresh});
+    } catch (_) {}
+  }
+
+  Future<void> _refresh() => Future.wait([_fetchShop(), _refreshUser()]);
 
   Future<void> _fetchShop() async {
     try {
@@ -690,20 +700,30 @@ class _ShopPageState extends State<ShopPage> {
       itemCount: pages.length,
       itemBuilder: (_, i) {
         final weapons = pages[i];
-        if (weapons.isEmpty) return _buildEmpty();
-        return GridView.builder(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 0.72,
-          ),
-          itemCount: weapons.length,
-          itemBuilder: (_, j) => GestureDetector(
-            onTap: () => _showWeaponDetail(weapons[j]),
-            child: _buildCard(weapons[j]),
-          ),
+        return RefreshIndicator(
+          onRefresh: _refresh,
+          color: Colors.white,
+          backgroundColor: const Color(0xFF3A3A3A),
+          child: weapons.isEmpty
+              ? ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [SizedBox(height: 300, child: _buildEmpty())],
+                )
+              : GridView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.72,
+                  ),
+                  itemCount: weapons.length,
+                  itemBuilder: (_, j) => GestureDetector(
+                    onTap: () => _showWeaponDetail(weapons[j]),
+                    child: _buildCard(weapons[j]),
+                  ),
+                ),
         );
       },
     );

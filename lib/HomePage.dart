@@ -73,6 +73,8 @@ class _HomePageState extends State<HomePage> {
     } catch (_) {}
   }
 
+  Future<void> _refresh() => Future.wait([_fetchWeapons(), _refreshUser()]);
+
   void _startBannerTimer() {
     _bannerTimer = Timer.periodic(const Duration(seconds: 3), (_) {
       if (!mounted) return;
@@ -131,9 +133,14 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: RefreshIndicator(
+                onRefresh: _refresh,
+                color: Colors.white,
+                backgroundColor: const Color(0xFF3A3A3A),
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -158,6 +165,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+          ),
             AppBottomNav(
               activeTab: NavTab.home,
               avatarUrl: _user['avatar'] as String?,

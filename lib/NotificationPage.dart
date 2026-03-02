@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'services/notification_service.dart';
+import 'services/auth_service.dart';
 import 'widgets/app_bottom_nav.dart';
 import 'InventoryPage.dart';
 import 'ProfilePage.dart';
@@ -20,13 +21,23 @@ class _NotificationPageState extends State<NotificationPage> {
   Color get _card => Theme.of(context).colorScheme.surface;
   Color get _text => Theme.of(context).colorScheme.onSurface;
 
+  Map<String, dynamic> _user = {};
   List<dynamic> _notifications = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _user = Map<String, dynamic>.from(widget.user);
     _fetchNotifications();
+    _refreshUser();
+  }
+
+  Future<void> _refreshUser() async {
+    try {
+      final fresh = await AuthService.getMe();
+      if (mounted) setState(() => _user = {..._user, ...fresh});
+    } catch (_) {}
   }
 
   Future<void> _fetchNotifications() async {
@@ -37,6 +48,8 @@ class _NotificationPageState extends State<NotificationPage> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+
+  Future<void> _refresh() => Future.wait([_fetchNotifications(), _refreshUser()]);
 
   /// Groups notifications by date. Returns list of {date, items}.
   List<Map<String, dynamic>> _grouped() {
@@ -111,28 +124,33 @@ class _NotificationPageState extends State<NotificationPage> {
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator(color: _subText))
-                  : _buildBody(),
+                  : RefreshIndicator(
+                      onRefresh: _refresh,
+                      color: Colors.white,
+                      backgroundColor: const Color(0xFF3A3A3A),
+                      child: _buildBody(),
+                    ),
             ),
             AppBottomNav(
               activeTab: NavTab.history,
-              avatarUrl: widget.user['avatar'] as String?,
+              avatarUrl: _user['avatar'] as String?,
               onTap: (tab) {
                 if (tab == NavTab.home) {
                   Navigator.pop(context);
                 } else if (tab == NavTab.inventory) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => InventoryPage(user: widget.user)),
+                    MaterialPageRoute(builder: (_) => InventoryPage(user: _user)),
                   );
                 } else if (tab == NavTab.profile) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
+                    MaterialPageRoute(builder: (_) => ProfilePage(user: _user)),
                   );
                 } else if (tab == NavTab.shop) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => ShopPage(user: widget.user)),
+                    MaterialPageRoute(builder: (_) => ShopPage(user: _user)),
                   );
                 }
               },

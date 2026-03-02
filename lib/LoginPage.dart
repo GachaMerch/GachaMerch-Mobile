@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'LoginPageAdmin.dart';
 import 'SignUpPage.dart';
 import 'HomePage.dart';
 import 'services/auth_service.dart';
@@ -120,19 +119,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           Container(color: BGColor),
-          Positioned(
-            top: 40,
-            right: 20,
-            child: Container(
-              height: 20.0,
-              width: 20.0,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/loginpage/adminLogo.png"),
-                ),
-              ),
-            ),
-          ),
           SingleChildScrollView(
             child: Column(
               children: [
@@ -419,27 +405,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ],
-            ),
-          ),
-          Positioned(
-            top: 40,
-            right: 20,
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPageAdmin()),
-                );
-              },
-              child: Container(
-                height: 20,
-                width: 20,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/loginpage/adminLogo.png"),
-                  ),
-                ),
-              ),
             ),
           ),
         ],
