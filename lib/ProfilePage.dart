@@ -3,20 +3,57 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'services/auth_service.dart';
 import 'LoginPage.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final Map<String, dynamic> user;
   const ProfilePage({super.key, required this.user});
 
   @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF1F1F1F) : const Color(0xFFF2F2F2);
-    final card = isDark ? const Color(0xFF2A2A2A) : Colors.white;
-    final text = isDark ? Colors.white : const Color(0xFF1A1A1A);
-    final subText = isDark ? const Color(0xFF88888A) : const Color(0xFF8A8A8E);
+  State<ProfilePage> createState() => _ProfilePageState();
+}
 
-    final avatarUrl = user['avatar'] as String?;
-    final username = user['username']?.toString() ?? 'Player';
+class _ProfilePageState extends State<ProfilePage> {
+  Map<String, dynamic> _user = <String, dynamic>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _user = Map<String, dynamic>.from(widget.user);
+  }
+
+  Color get _bg => Theme.of(context).brightness == Brightness.dark
+      ? const Color(0xFF1F1F1F)
+      : const Color(0xFFF2F2F2);
+  Color get _card => Theme.of(context).brightness == Brightness.dark
+      ? const Color(0xFF2A2A2A)
+      : Colors.white;
+  Color get _text => Theme.of(context).brightness == Brightness.dark
+      ? Colors.white
+      : const Color(0xFF1A1A1A);
+  Color get _subText => Theme.of(context).brightness == Brightness.dark
+      ? const Color(0xFF88888A)
+      : const Color(0xFF8A8A8E);
+
+  void _showProfileEditDialog() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.6),
+      builder: (_) => _ProfileEditDialog(
+        user: _user,
+        onSaved: (updated) => setState(() => _user = {..._user, ...updated}),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = _bg;
+    final card = _card;
+    final text = _text;
+    final subText = _subText;
+
+    final avatarUrl = _user['avatar'] as String?;
+    final username = _user['username']?.toString() ?? 'Player';
+    final status = _user['status']?.toString() ?? 'Never Surrenders';
 
     return Scaffold(
       backgroundColor: bg,
@@ -45,7 +82,6 @@ class ProfilePage extends StatelessWidget {
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            // gradient overlay — full height
                             DecoratedBox(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -147,7 +183,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Never Surrenders',
+                    status,
                     style: TextStyle(
                       color: subText,
                       fontFamily: 'Alexandria',
@@ -155,7 +191,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 28),
-                  // menu items — each in own card
+                  // menu items
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
@@ -167,7 +203,7 @@ class ProfilePage extends StatelessWidget {
                           textColor: text,
                           iconColor: subText,
                           trailing: Icon(Icons.chevron_right, color: subText, size: 20),
-                          onTap: () {},
+                          onTap: _showProfileEditDialog,
                         ),
                         const SizedBox(height: 10),
                         _ColorModeCard(card: card, textColor: text, iconColor: subText),
@@ -266,7 +302,7 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildBottomNav(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final avatarUrl = user['avatar'] as String?;
+    final avatarUrl = _user['avatar'] as String?;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -338,6 +374,265 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+// ── Profile Edit Dialog ────────────────────────────────────────────────────────
+
+class _ProfileEditDialog extends StatefulWidget {
+  final Map<String, dynamic> user;
+  final ValueChanged<Map<String, dynamic>> onSaved;
+
+  const _ProfileEditDialog({required this.user, required this.onSaved});
+
+  @override
+  State<_ProfileEditDialog> createState() => _ProfileEditDialogState();
+}
+
+class _ProfileEditDialogState extends State<_ProfileEditDialog> {
+  late final TextEditingController _nameCtrl;
+  final TextEditingController _passCtrl = TextEditingController();
+  final TextEditingController _confirmPassCtrl = TextEditingController();
+  bool _showPass = false;
+  bool _showConfirmPass = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController(
+      text: widget.user['username']?.toString() ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _passCtrl.dispose();
+    _confirmPassCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_passCtrl.text.isNotEmpty && _passCtrl.text != _confirmPassCtrl.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+    if (_passCtrl.text.isNotEmpty && _passCtrl.text.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must be at least 8 characters')),
+      );
+      return;
+    }
+    setState(() => _isLoading = true);
+    try {
+      final updated = await AuthService.updateProfile(
+        username: _nameCtrl.text.trim(),
+        password: _passCtrl.text.isNotEmpty ? _passCtrl.text : null,
+      );
+      widget.onSaved(updated);
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dialogBg = isDark ? const Color(0xFF2A2A2A) : Colors.white;
+    final fieldBg = isDark ? const Color(0xFF1F1F1F) : const Color(0xFFF2F2F2);
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A1A);
+    final subText = isDark ? const Color(0xFF88888A) : const Color(0xFF8A8A8E);
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+      child: Container(
+        decoration: BoxDecoration(
+          color: dialogBg,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Profile Edit',
+                  style: TextStyle(
+                    color: textColor,
+                    fontFamily: 'Alexandria',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Icon(Icons.close, color: subText, size: 20),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _label("Player's Name", textColor),
+            const SizedBox(height: 6),
+            _field(
+              controller: _nameCtrl,
+              hint: 'Your Name',
+              fieldBg: fieldBg,
+              textColor: textColor,
+              subText: subText,
+              suffix: Icon(Icons.edit_outlined, color: subText, size: 18),
+            ),
+            const SizedBox(height: 12),
+            _label('Change Password', textColor),
+            const SizedBox(height: 6),
+            _field(
+              controller: _passCtrl,
+              hint: 'min. 8 characters',
+              fieldBg: fieldBg,
+              textColor: textColor,
+              subText: subText,
+              obscure: !_showPass,
+              suffix: GestureDetector(
+                onTap: () => setState(() => _showPass = !_showPass),
+                child: Icon(
+                  _showPass
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: subText,
+                  size: 18,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _label('Confirm Password', textColor),
+            const SizedBox(height: 6),
+            _field(
+              controller: _confirmPassCtrl,
+              hint: 'min. 8 characters',
+              fieldBg: fieldBg,
+              textColor: textColor,
+              subText: subText,
+              obscure: !_showConfirmPass,
+              suffix: GestureDetector(
+                onTap: () =>
+                    setState(() => _showConfirmPass = !_showConfirmPass),
+                child: Icon(
+                  _showConfirmPass
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: subText,
+                  size: 18,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // save button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3A3A3A),
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: const Color(0xFF3A3A3A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation(Colors.white),
+                        ),
+                      )
+                    : const Text(
+                        'Save Changes',
+                        style: TextStyle(
+                          fontFamily: 'Alexandria',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _label(String text, Color color) {
+    return Text(
+      text,
+      style: TextStyle(
+        color: color,
+        fontFamily: 'Alexandria',
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  Widget _field({
+    required TextEditingController controller,
+    required String hint,
+    required Color fieldBg,
+    required Color textColor,
+    required Color subText,
+    bool obscure = false,
+    Widget? suffix,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: fieldBg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: subText.withValues(alpha: 0.2)),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscure,
+        style: TextStyle(
+          color: textColor,
+          fontFamily: 'Alexandria',
+          fontSize: 14,
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: subText, fontSize: 14),
+          suffixIcon: suffix != null
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: suffix,
+                )
+              : null,
+          suffixIconConstraints: const BoxConstraints(),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Color Mode Card ────────────────────────────────────────────────────────────
+
 class _ColorModeCard extends StatelessWidget {
   final Color card;
   final Color textColor;
@@ -374,7 +669,6 @@ class _ColorModeCard extends StatelessWidget {
                   ),
                 ),
               ),
-              // OverflowBox prevents Switch from affecting card height
               SizedBox(
                 height: 22,
                 width: 52,
@@ -402,4 +696,3 @@ class _ColorModeCard extends StatelessWidget {
     );
   }
 }
-

@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _prodUrl = 'https://gachamerch-be.drian.my.id/api';
-const String _devUrl = 'http://10.0.2.2:3000/api'; 
+const String _devUrl = 'http://10.0.2.2:3000/api';
 String get _baseUrl => kReleaseMode ? _prodUrl : _devUrl;
 
 class AuthService {
@@ -50,6 +50,45 @@ class AuthService {
       return data['data'];
     }
     throw Exception(data['message'] ?? 'Login failed');
+  }
+
+  static Future<Map<String, dynamic>> updateProfile({
+    required String username,
+    String? password,
+  }) async {
+    final token = await getToken();
+    final body = <String, dynamic>{'username': username};
+    if (password != null && password.isNotEmpty) {
+      body['password'] = password;
+    }
+    final res = await http.patch(
+      Uri.parse('$_baseUrl/auth/profile'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(body),
+    );
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 200 && data['success'] == true) {
+      return data['data'];
+    }
+    throw Exception(data['message'] ?? 'Update failed');
+  }
+
+  static Future<Map<String, dynamic>> getMe() async {
+    final token = await getToken();
+    final res = await http.get(
+      Uri.parse('$_baseUrl/auth/me'),
+      headers: {
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 200 && data['success'] == true) {
+      return data['data'];
+    }
+    throw Exception(data['message'] ?? 'Failed to fetch user');
   }
 
   static Future<void> _saveToken(String token) async {
