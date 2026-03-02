@@ -5,7 +5,8 @@ import 'services/weapon_service.dart';
 import 'services/auth_service.dart';
 import 'widgets/buy_dialog.dart';
 import 'widgets/app_bottom_nav.dart';
-import 'utils.dart';
+import 'widgets/weapon_admin_sheet.dart';
+import 'utils/format.dart';
 import 'ProfilePage.dart';
 import 'InventoryPage.dart';
 import 'ShopPage.dart';
@@ -29,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   Color get _card => Theme.of(context).colorScheme.surface;
   Color get _text => Theme.of(context).colorScheme.onSurface;
   static const Color _subText = Color(0xFF88888A);
+  bool get _isAdmin => _user['roleId'] == 1;
 
   Map<String, dynamic> _user = <String, dynamic>{};
   List<dynamic> _weapons = [];
@@ -284,45 +286,64 @@ class _HomePageState extends State<HomePage> {
                 itemCount: _weapons.length,
                 itemBuilder: (_, i) => GestureDetector(
                   onTap: () => _showWeaponDetail(_weapons[i]),
-                  child: _buildWeaponCard(_weapons[i]),
+                  child: _buildWeaponCard(_weapons[i], isAdmin: _isAdmin),
                 ),
               ),
       ],
     );
   }
 
-  Widget _buildWeaponCard(dynamic weapon) {
+  Widget _buildWeaponCard(dynamic weapon, {bool isAdmin = false}) {
     final imagePath = weapon['Image'] as String?;
     final imageUrl = (imagePath != null && imagePath.isNotEmpty)
         ? '$_mediaBaseUrl$imagePath'
         : null;
     final cardColor = _card;
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: imageUrl != null
-            ? Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                loadingBuilder: (_, child, progress) => progress == null
-                    ? child
-                    : Container(
-                        color: cardColor,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: _subText,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      ),
-                errorBuilder: (_, __, ___) => _weaponDummy(cardColor),
-              )
-            : _weaponDummy(cardColor),
-      ),
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              color: cardColor,
+              child: imageUrl != null
+                  ? Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (_, child, progress) => progress == null
+                          ? child
+                          : Container(
+                              color: cardColor,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: _subText,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                      errorBuilder: (_, __, ___) => _weaponDummy(cardColor),
+                    )
+                  : _weaponDummy(cardColor),
+            ),
+          ),
+        ),
+        if (isAdmin)
+          Positioned(
+            top: 6,
+            right: 6,
+            child: GestureDetector(
+              onTap: () => _showAdminSheet(weapon),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.more_horiz, color: Colors.white, size: 16),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -553,6 +574,20 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ],
+    );
+  }
+
+  void _showAdminSheet(dynamic weapon) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      showDragHandle: false,
+      elevation: 0,
+      builder: (_) => WeaponAdminSheet(
+        weapon: weapon,
+        onChanged: _fetchWeapons,
+      ),
     );
   }
 

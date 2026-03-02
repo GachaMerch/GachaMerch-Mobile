@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/order_service.dart';
-import '../utils.dart';
+import '../utils/format.dart';
 
 enum _BuyStep { quantity, confirm, loading, success, error }
 

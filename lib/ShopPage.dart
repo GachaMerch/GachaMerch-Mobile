@@ -5,10 +5,11 @@ import 'services/shop_service.dart';
 import 'services/auth_service.dart';
 import 'widgets/app_bottom_nav.dart';
 import 'widgets/buy_dialog.dart';
+import 'widgets/weapon_admin_sheet.dart';
 import 'InventoryPage.dart';
 import 'ProfilePage.dart';
 import 'NotificationPage.dart';
-import 'utils.dart';
+import 'utils/format.dart';
 
 const String _mediaBaseUrl = kReleaseMode
     ? 'https://gachamerch-be.drian.my.id'
@@ -42,6 +43,7 @@ class _ShopPageState extends State<ShopPage> {
   Color get _bg   => Theme.of(context).scaffoldBackgroundColor;
   Color get _card => Theme.of(context).colorScheme.surface;
   Color get _text => Theme.of(context).colorScheme.onSurface;
+  bool  get _isAdmin => _user['roleId'] == 1;
 
   Map<String, dynamic> _user = {};
   List<dynamic> _limitedItems = [];
@@ -438,6 +440,20 @@ class _ShopPageState extends State<ShopPage> {
     );
   }
 
+  void _showAdminSheet(dynamic weapon) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      showDragHandle: false,
+      elevation: 0,
+      builder: (_) => WeaponAdminSheet(
+        weapon: weapon,
+        onChanged: _fetchShop,
+      ),
+    );
+  }
+
   Future<void> _showBuyFlow(dynamic weapon) async {
     final result = await showDialog<Map<String, dynamic>?>(
       context: context,
@@ -721,7 +737,7 @@ class _ShopPageState extends State<ShopPage> {
                   itemCount: weapons.length,
                   itemBuilder: (_, j) => GestureDetector(
                     onTap: () => _showWeaponDetail(weapons[j]),
-                    child: _buildCard(weapons[j]),
+                    child: _buildCard(weapons[j], isAdmin: _isAdmin),
                   ),
                 ),
         );
@@ -729,7 +745,7 @@ class _ShopPageState extends State<ShopPage> {
     );
   }
 
-  Widget _buildCard(dynamic weapon) {
+  Widget _buildCard(dynamic weapon, {bool isAdmin = false}) {
     final imagePath = weapon['Image'] as String?;
     final imageUrl  = (imagePath != null && imagePath.isNotEmpty) ? '$_mediaBaseUrl$imagePath' : null;
     final price     = num.tryParse(weapon['Price']?.toString() ?? '')?.toInt() ?? 0;
@@ -804,6 +820,21 @@ class _ShopPageState extends State<ShopPage> {
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(6)),
               child: Text('-$discount', style: const TextStyle(color: Colors.white, fontFamily: 'Alexandria', fontSize: 9, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        if (isAdmin)
+          Positioned(
+            top: 6, right: 6,
+            child: GestureDetector(
+              onTap: () => _showAdminSheet(weapon),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.more_horiz, color: Colors.white, size: 14),
+              ),
             ),
           ),
       ],

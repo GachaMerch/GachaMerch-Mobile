@@ -6,7 +6,7 @@ import 'widgets/app_bottom_nav.dart';
 import 'ProfilePage.dart';
 import 'ShopPage.dart';
 import 'NotificationPage.dart';
-import 'utils.dart';
+import 'utils/format.dart';
 
 const String _mediaBaseUrl = kReleaseMode
     ? 'https://gachamerch-be.drian.my.id'
