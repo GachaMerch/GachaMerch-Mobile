@@ -8,6 +8,7 @@ import 'InventoryPage.dart';
 import 'ShopPage.dart';
 import 'NotificationPage.dart';
 import 'LoginPage.dart';
+import 'AboutUsPage.dart';
 
 class ProfilePage extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -246,7 +247,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           textColor: text,
                           iconColor: subText,
                           trailing: Icon(Icons.chevron_right, color: subText, size: 20),
-                          onTap: () {},
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const AboutUsPage()),
+                          ),
                         ),
                         const SizedBox(height: 10),
                         _menuCard(
