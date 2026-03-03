@@ -138,10 +138,13 @@ class _InventoryPageState extends State<InventoryPage> {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: Image.asset(
-                      'assets/icon/Polygon.png',
-                      width: 20,
-                      height: 20,
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF88888A),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
                 ),
@@ -233,7 +236,14 @@ class _InventoryPageState extends State<InventoryPage> {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: Image.asset('assets/icon/Polygon.png', width: 20, height: 20),
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF88888A),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
                 ),
                 const Divider(color: Color(0xFF4A4A4A), thickness: 1, height: 1),

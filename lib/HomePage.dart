@@ -382,10 +382,13 @@ class _HomePageState extends State<HomePage> {
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: Image.asset(
-                    'assets/icon/Polygon.png',
-                    width: 20,
-                    height: 20,
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF88888A),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
               ),
@@ -530,8 +533,8 @@ class _HomePageState extends State<HomePage> {
                               const SizedBox(width: 8),
                               Text(
                                 price,
-                                style: TextStyle(
-                                  color: textColor,
+                                style: const TextStyle(
+                                  color: Colors.white,
                                   fontFamily: 'Alexandria',
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
