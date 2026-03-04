@@ -136,11 +136,11 @@ class _ShopPageState extends State<ShopPage> {
           return (num.tryParse(b['Price']?.toString() ?? '') ?? 0)
               .compareTo(num.tryParse(a['Price']?.toString() ?? '') ?? 0);
         case _ShopSort.rarityDesc:
-          return ((b['Rarity'] as num?) ?? 0)
-              .compareTo((a['Rarity'] as num?) ?? 0);
+          return (num.tryParse(b['Rarity']?.toString() ?? '') ?? 0)
+              .compareTo(num.tryParse(a['Rarity']?.toString() ?? '') ?? 0);
         case _ShopSort.rarityAsc:
-          return ((a['Rarity'] as num?) ?? 0)
-              .compareTo((b['Rarity'] as num?) ?? 0);
+          return (num.tryParse(a['Rarity']?.toString() ?? '') ?? 0)
+              .compareTo(num.tryParse(b['Rarity']?.toString() ?? '') ?? 0);
       }
     });
     return l;
