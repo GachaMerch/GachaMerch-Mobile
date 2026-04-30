@@ -1,15 +1,16 @@
-name: Build Flutter Android
+name: GachaMerch Android APK Build
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
-    name: Build APK & AAB
+    name: Build APK and AAB
     runs-on: ubuntu-latest
 
     steps:
@@ -20,51 +21,70 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: "17"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.32.1
+          flutter-version: "3.32.1"
           channel: stable
           cache: true
-
-      - name: Restore google-services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
-
-      - name: Decode keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > gachamerch.jks
-
-      - name: Create key.properties
-        run: |
-          cat <<EOF > android/key.properties
-          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword=${{ secrets.KEY_PASSWORD }}
-          keyAlias=${{ secrets.KEY_ALIAS }}
-          storeFile=../../gachamerch.jks
-          EOF
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Build release APK
+        run: flutter build apk --release --split-per-abi --build-number ${{ github.run_number }}
 
-      - name: Build AAB
-        run: flutter build appbundle --release
+      - name: Build release AAB
+        run: flutter build appbundle --release --build-number ${{ github.run_number }}
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 7
+          name: gachamerch-release-apk
+          path: build/app/outputs/flutter-apk/*-release.apk
+          retention-days: 14
 
-      - name: Upload AAB
+      - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-aab
+          name: gachamerch-release-aab
           path: build/app/outputs/bundle/release/app-release.aab
-          retention-days: 7
+          retention-days: 14
+
+      - name: Generate release metadata
+        id: release_meta
+        run: |
+          echo "tag=v1.0.0-build.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          echo "date=$(date +'%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release notes
+        run: |
+          RECENT_CHANGES=$(git log -5 --pretty=format:"- %s (%h)")
+
+          cat > release_notes.md <<EOF
+          ## Build Information
+          - Build number: ${{ github.run_number }}
+          - Build date: ${{ steps.release_meta.outputs.date }}
+          - Commit: ${{ github.sha }}
+          - Branch: ${{ github.ref_name }}
+
+          ## Artifacts
+          - APK: Android sideload/install builds split per ABI
+          - AAB: Google Play upload build
+
+          ## Recent Changes
+          $RECENT_CHANGES
+          EOF
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.release_meta.outputs.tag }}" \
+            build/app/outputs/flutter-apk/*-release.apk \
+            build/app/outputs/bundle/release/app-release.aab \
+            --title "GachaMerch Build #${{ github.run_number }}" \
+            --notes-file release_notes.md \
+            --target "${{ github.sha }}"
