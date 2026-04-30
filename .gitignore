@@ -55,3 +55,4 @@ ios/Runner/GoogleService-Info.plist
 *.jks
 *.keystore
 android/key.properties
+gachamerch-android-keystore-secrets.txt

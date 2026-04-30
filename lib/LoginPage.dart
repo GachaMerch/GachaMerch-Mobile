@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'config/google_auth_config.dart';
 import 'SignUpPage.dart';
 import 'HomePage.dart';
 import 'services/auth_service.dart';
@@ -21,8 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    serverClientId:
-        '62326984297-7h3mhkib7rjg4paqfkomvrq83t8omnrb.apps.googleusercontent.com',
+    serverClientId: googleServerClientId,
   );
 
   @override
@@ -61,6 +61,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _handleGoogleSignIn() async {
+    if (!isGoogleSignInConfigured) {
+      _showError('Google Sign-In is not configured for this build.');
+      return;
+    }
+
     setState(() => _isLoadingGoogle = true);
     try {
       final GoogleSignInAccount? account = await _googleSignIn.signIn();
