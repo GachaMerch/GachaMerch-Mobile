@@ -47,10 +47,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Sensitive Firebase/Google config files
-android/app/google-services.json
-ios/Runner/GoogleService-Info.plist
-
 # Keystore & signing
 *.jks
 *.keystore
