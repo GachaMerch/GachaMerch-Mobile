@@ -12,12 +12,21 @@ jobs:
   build:
     name: Build APK and AAB
     runs-on: ubuntu-latest
-    env:
-      GOOGLE_SERVER_CLIENT_ID: ${{ vars.GOOGLE_SERVER_CLIENT_ID || secrets.GOOGLE_SERVER_CLIENT_ID || '477114095926-6dcctc43dpfesn78js1jfl4estm8dggj.apps.googleusercontent.com' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Create Flutter env file
+        env:
+          GOOGLE_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
+        run: |
+          if [ -z "$GOOGLE_SERVER_CLIENT_ID" ]; then
+            echo "GOOGLE_SERVER_CLIENT_ID secret is required"
+            exit 1
+          fi
+
+          printf 'GOOGLE_SERVER_CLIENT_ID=%s\n' "$GOOGLE_SERVER_CLIENT_ID" > .env
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -28,7 +37,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.32.1"
+          flutter-version: "3.38.9"
           channel: stable
           cache: true
 
@@ -59,10 +68,10 @@ jobs:
         run: dart run flutter_launcher_icons
 
       - name: Build release APK
-        run: flutter build apk --release --split-per-abi --build-number ${{ github.run_number }} --dart-define=GOOGLE_SERVER_CLIENT_ID="$GOOGLE_SERVER_CLIENT_ID"
+        run: flutter build apk --release --split-per-abi --build-number ${{ github.run_number }}
 
       - name: Build release AAB
-        run: flutter build appbundle --release --build-number ${{ github.run_number }} --dart-define=GOOGLE_SERVER_CLIENT_ID="$GOOGLE_SERVER_CLIENT_ID"
+        run: flutter build appbundle --release --build-number ${{ github.run_number }}
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

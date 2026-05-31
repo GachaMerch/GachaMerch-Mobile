@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'LoginPage.dart';
 import 'HomePage.dart';
 import 'services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env', isOptional: true);
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
   runApp(MyApp(savedThemeMode: savedThemeMode));
 }
@@ -27,11 +29,15 @@ class MyApp extends StatelessWidget {
         ),
         switchTheme: SwitchThemeData(
           thumbColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return Colors.white;
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
             return const Color(0xFF88888A);
           }),
           trackColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return const Color(0xFF4A4A4A);
+            if (states.contains(WidgetState.selected)) {
+              return const Color(0xFF4A4A4A);
+            }
             return const Color(0xFFCCCCCC);
           }),
           trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
@@ -53,11 +59,15 @@ class MyApp extends StatelessWidget {
         ),
         switchTheme: SwitchThemeData(
           thumbColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return Colors.white;
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
             return const Color(0xFF88888A);
           }),
           trackColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return const Color(0xFF4A4A4A);
+            if (states.contains(WidgetState.selected)) {
+              return const Color(0xFF4A4A4A);
+            }
             return const Color(0xFF2A2A2A);
           }),
           trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
@@ -121,8 +131,6 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
-    );
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }

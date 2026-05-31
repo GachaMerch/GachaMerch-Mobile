@@ -52,3 +52,8 @@ app.*.map.json
 *.keystore
 android/key.properties
 gachamerch-android-keystore-secrets.txt
+
+# Local environment files
+.env
+.env.*
+!.env.example
