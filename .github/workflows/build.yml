@@ -20,13 +20,19 @@ jobs:
       - name: Create Flutter env file
         env:
           GOOGLE_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
+          BACKEND_BASE_URL: ${{ vars.BACKEND_BASE_URL || 'https://gachamerch-be.drian.my.id' }}
         run: |
           if [ -z "$GOOGLE_SERVER_CLIENT_ID" ]; then
             echo "GOOGLE_SERVER_CLIENT_ID secret is required"
             exit 1
           fi
 
-          printf 'GOOGLE_SERVER_CLIENT_ID=%s\n' "$GOOGLE_SERVER_CLIENT_ID" > .env
+          if [ -z "$BACKEND_BASE_URL" ]; then
+            echo "BACKEND_BASE_URL is required"
+            exit 1
+          fi
+
+          printf 'GOOGLE_SERVER_CLIENT_ID=%s\nBACKEND_BASE_URL=%s\n' "$GOOGLE_SERVER_CLIENT_ID" "$BACKEND_BASE_URL" > .env
 
       - name: Setup Java
         uses: actions/setup-java@v4
