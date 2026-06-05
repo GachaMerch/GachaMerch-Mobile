@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'config/backend_config.dart';
 import 'services/shop_service.dart';
 import 'services/auth_service.dart';
 import 'widgets/app_bottom_nav.dart';
@@ -11,9 +11,7 @@ import 'ProfilePage.dart';
 import 'NotificationPage.dart';
 import 'utils/format.dart';
 
-const String _mediaBaseUrl = kReleaseMode
-    ? 'https://gachamerch-be.drian.my.id'
-    : 'http://10.0.2.2:3000';
+String get _mediaBaseUrl => backendBaseUrl;
 
 const Color _subText = Color(0xFF88888A);
 const Color _gold = Color(0xFFD4AF37);

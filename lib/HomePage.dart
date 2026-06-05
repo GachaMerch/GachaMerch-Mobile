@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'config/backend_config.dart';
 import 'services/weapon_service.dart';
 import 'services/auth_service.dart';
 import 'widgets/buy_dialog.dart';
@@ -12,9 +12,7 @@ import 'InventoryPage.dart';
 import 'ShopPage.dart';
 import 'NotificationPage.dart';
 
-const String _mediaBaseUrl = kReleaseMode
-    ? 'https://gachamerch-be.drian.my.id'
-    : 'http://10.0.2.2:3000';
+String get _mediaBaseUrl => backendBaseUrl;
 
 class HomePage extends StatefulWidget {
   final Map<String, dynamic> user;

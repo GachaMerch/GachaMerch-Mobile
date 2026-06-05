@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'config/backend_config.dart';
 
 const Color _bg = Color(0xFF1F1F1F);
 const Color _card = Color(0xFF2A2A2A);
@@ -6,10 +7,7 @@ const Color _text = Color(0xFFFFFFFF);
 const Color _subText = Color(0xFF88888A);
 const Color _gold = Color(0xFFFFD700);
 
-const String _mediaBaseUrl = String.fromEnvironment(
-  'MEDIA_BASE_URL',
-  defaultValue: 'http://10.0.2.2:3000',
-);
+String get _mediaBaseUrl => backendBaseUrl;
 
 class WeaponDetailPage extends StatelessWidget {
   final Map<String, dynamic> weapon;

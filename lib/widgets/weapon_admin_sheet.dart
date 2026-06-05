@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../config/backend_config.dart';
 import '../services/weapon_service.dart';
 
-const String _mediaBase = kReleaseMode
-    ? 'https://gachamerch-be.drian.my.id'
-    : 'http://10.0.2.2:3000';
+String get _mediaBase => backendBaseUrl;
 
 const Color _sub  = Color(0xFF88888A);
 const Color _gold = Color(0xFFD4AF37);

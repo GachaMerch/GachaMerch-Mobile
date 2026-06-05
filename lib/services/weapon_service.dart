@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../config/backend_config.dart';
 import 'auth_service.dart';
 
-const String _prodUrl = 'https://gachamerch-be.drian.my.id/api';
-const String _devUrl = 'http://10.0.2.2:3000/api';
-String get _baseUrl => kReleaseMode ? _prodUrl : _devUrl;
+String get _baseUrl => backendApiBaseUrl;
 
 class WeaponService {
   static Future<void> createWeapon({
